@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Insights</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #1900ff, #000000, #0019fb);
+            color: #e0e6ed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 720px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            text-align: center;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .positive {
+            color: #ff5c5c;
+            text-shadow: 0 0 10px rgba(255, 92, 92, 0.7);
+        }
+
+        .negative {
+            color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
+        }
+
+        .probability-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            height: 16px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .probability-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 12px;
+            transition: width 1.5s ease;
+        }
+
+        .probability-positive .probability-fill {
+            background: linear-gradient(90deg, #ff5c5c, #a71d2a);
+        }
+
+        .probability-negative .probability-fill {
+            background: linear-gradient(90deg, #00ffcc, #0d9488);
+        }
+
+        .content {
+            opacity: 0;
+            transition: opacity 0.8s ease-in;
+            text-align: left;
+            margin-top: 25px;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .section h3 {
+            font-size: 1.2rem;
+            color: #000000;
+            border-left: 4px solid #00e5ff;
+            padding-left: 10px;
+        }
+
+        .section ul {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+
+        .section li {
+            margin: 8px 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .advice-positive {
+            color: #00ffcc;
+        }
+
+        .advice-negative {
+            color: #ff5c5c;
+        }
+
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #00e5ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin: 30px auto;
+            animation: spin 1s linear infinite;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 25px;
+            color: #00e5ff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #ffffff;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        {% if prob %}
+            {% if is_positive %}
+                <h2 class="positive">{{ result_text }}</h2>
+                <div class="probability-bar probability-positive">
+                    <div class="probability-fill" id="probBar" style="width: {{ prob_percent }}%;"></div>
+                </div>
+            {% else %}
+                <h2 class="negative">{{ result_text }}</h2>
+                <div class="probability-bar probability-negative">
+                    <div class="probability-fill" id="probBar" style="width: {{ prob_percent }}%;"></div>
+                </div>
+            {% endif %}
+
+            <p style="margin-top: 10px;">Churn Probability: <strong>{{ prob }}</strong> (Threshold: {{ threshold }})</p>
+
+            <div id="loadingSection">
+                <div class="loader"></div>
+                <p>Analyzing customer profile for insights...</p>
+            </div>
+
+            <div id="adviceSection" class="content" style="display: none;">
+                <div class="section">
+                    <h3>Reasons for Prediction</h3>
+                    <ul>
+                        {% for reason in reasons %}
+                            <li>• {{ reason }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>Recommended Actions & Positive Feedback</h3>
+                    <ul>
+                        {% for tip in advice %}
+                            {% if '✅' in tip %}
+                                <li class="advice-positive">{{ tip }}</li>
+                            {% elif '⚠️' in tip %}
+                                <li class="advice-negative">{{ tip }}</li>
+                            {% else %}
+                                <li>{{ tip }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <h2>{{ result_text }}</h2>
+        {% endif %}
+
+        <a href="{% url 'predict_churn' %}">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById("loadingSection").style.display = "none";
+                const advice = document.getElementById("adviceSection");
+                advice.style.display = "block";
+                setTimeout(() => advice.style.opacity = 1, 200);
+            }, 3000);
+        };
+    </script>
+</body>
+</html>

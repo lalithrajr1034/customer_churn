@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Prediction</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #2a5298 50%, #3d5a90 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -300px;
+            right: -300px;
+            animation: float 25s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(65,105,225,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -250px;
+            left: -250px;
+            animation: float 20s infinite ease-in-out reverse;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, 40px) scale(1.1); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffd700;
+            text-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 580px;
+            margin: 0 auto;
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+                0 0 0 1px rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            padding-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+            animation: fadeIn 0.6s ease backwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.15s; }
+        .form-group:nth-child(3) { animation-delay: 0.2s; }
+        .form-group:nth-child(4) { animation-delay: 0.25s; }
+        .form-group:nth-child(5) { animation-delay: 0.3s; }
+        .form-group:nth-child(6) { animation-delay: 0.35s; }
+        .form-group:nth-child(7) { animation-delay: 0.4s; }
+        .form-group:nth-child(8) { animation-delay: 0.45s; }
+        .form-group:nth-child(9) { animation-delay: 0.5s; }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #ffffff;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            opacity: 0.95;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        input:focus {
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+
+        select:focus {
+            border-color: #ffd700;
+            background-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.15);
+        }
+
+        select:hover {
+            background-color: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        select option {
+            background: #1e3c72;
+            color: #ffffff;
+            padding: 12px;
+            font-weight: 500;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 28px;
+            padding: 16px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #ffffff;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+            border-color: #ffffff;
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 24px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            max-width: 580px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            animation: fadeInUp 1s ease;
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .team-name {
+            color: #ffd700;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .footer-links {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+            height: 40px;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 20px 15px;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 30px 24px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                margin-bottom: 24px;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            .footer {
+                margin-top: 30px;
+                padding: 20px 16px;
+            }
+        }
+
+        select::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        select::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        select::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🏦 BCCP</div>
+        <div class="tagline">INTELLIGENT CHURN Prediction</div>
+    </div>
+
+    <div class="container">
+        <h2>What Will Your Customer Do?<br> Will Stay or Churn.
+        </h2>
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Credit Score</label>
+                <input type="number" name="CreditScore" min="300" max="900" step="1" placeholder="Enter credit score (300 - 900s)" 
+                    oninput="if(this.value > 900) this.value = 900;" 
+                    onblur="if(this.value && this.value < 300) this.value = 300;" required>
+            </div>
+
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" name="Age" min="18" max="100" step="1" placeholder="Enter age (18 - 100)" 
+                    oninput="if(this.value > 100) this.value = 100;" 
+                    onblur="if(this.value && this.value < 18) this.value = 18;" required>
+            </div>
+
+            <div class="form-group">
+                <label>Tenure (Years)</label>
+                <input type="number" name="Tenure" min="0" max="10" step="1" placeholder="Years with Bank (0 - 10)" 
+                    oninput="if(this.value > 10) this.value = 10;" 
+                    onblur="if(this.value && this.value < 0) this.value = 0;" required>
+            </div>
+
+            <div class="form-group">
+                <label>Balance</label>
+                <input type="number" name="Balance" min="0" max="4500000" step="any" placeholder="Account balance Max='45 lakhs'"
+                 oninput="if(this.value > 4500000) this.value = 4500000;"  
+                    onblur="if(this.value && this.value < 0) this.value = 0;" required>
+            </div>
+
+            <div class="form-group">
+                <label>Number of Products</label>
+                <input type="number" name="NumOfProducts" min="1" max="4" step="1" placeholder="Products owned (1 - 4)" 
+                    oninput="if(this.value > 4) this.value = 4;" 
+                    onblur="if(this.value && this.value < 1) this.value = 1;" required>
+            </div>
+
+            <div class="form-group">
+                <label>Estimated Salary</label>
+                <input type="number" name="EstimatedSalary" min="v" max="1200000" step="any" placeholder="Annual salary estimate" 
+                oninput="if(this.value > 1200000) this.value = 1200000;"    
+                onblur="if(this.value && this.value < 11.58) this.value = 0;" required>
+            </div>
+
+            <div class="form-group">
+                <label>Has Credit Card</label>
+                <select name="HasCrCard" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Is Active Member</label>
+                <select name="IsActiveMember" required>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Gender</label>
+                <select name="Gender" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+
+            <button type="submit">Predict Churn</button>
+        </form>
+    </div>
+<!-- 💬 Advanced Churn Assistant with full sub-answers -->
+<div id="chatbot-wrapper">
+  <div id="chat-icon" onclick="toggleChat()">💬</div>
+
+  <div id="chat-box">
+    <div id="chat-header">
+      <span>🤖 Churn Assistant</span>
+      <button id="close-btn" onclick="toggleChat()">✖</button>
+    </div>
+    <div id="chat-content"></div>
+    <div id="chat-footer">
+      <button id="reset-btn" onclick="resetChat()">🔄 Reset</button>
+    </div>
+  </div>
+</div>
+
+<style>
+#chatbot-wrapper { position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: 'Inter', sans-serif; }
+#chat-icon { background: linear-gradient(135deg,#1e3c72,#2a5298); color:#fff; width:65px; height:65px; border-radius:50%; font-size:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.6); transition:transform 0.2s ease; }
+#chat-icon:hover { transform: scale(1.1); }
+#chat-box { display:none; flex-direction:column; width:360px; height:540px; background: rgba(20,20,30,0.95); border-radius:18px; overflow:hidden; box-shadow:0 6px 25px rgba(0,0,0,0.6); }
+#chat-header { background: linear-gradient(135deg,#0f0c29,#302b63,#24243e); color:white; font-weight:600; padding:14px; display:flex; justify-content:space-between; align-items:center; font-size:16px; letter-spacing:0.5px; }
+#close-btn { background:transparent; border:none; color:white; font-size:18px; cursor:pointer; }
+#chat-content { flex-grow:1; padding:12px; overflow-y:auto; color:#fff; font-size:14px; display:flex; flex-direction:column; }
+.bot-msg, .user-msg { max-width:80%; padding:10px 14px; border-radius:16px; margin-bottom:10px; line-height:1.5; word-wrap: break-word; opacity:0; transform:translateX(-30px); animation: slideIn 0.5s forwards; }
+.bot-msg { align-self:flex-start; background: linear-gradient(135deg,#3a3a5e,#5e5e8a); color:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.4); position: relative; }
+.user-msg { align-self:flex-end; background: linear-gradient(135deg,#6b5b95,#b8a9c9); color:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.4); }
+.loading { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; display:inline-block; margin-left: 5px; vertical-align:middle; }
+@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+@keyframes slideIn { to { opacity:1; transform:translateX(0);} }
+#chat-footer { background: rgba(0,0,0,0.25); padding:10px; text-align:center; }
+#reset-btn { background: linear-gradient(135deg,#6b5b95,#b8a9c9); border:none; color:white; padding:8px 14px; border-radius:8px; font-weight:500; cursor:pointer; transition:0.3s; }
+#reset-btn:hover { transform: scale(1.05); }
+.option-btn { background: rgba(255,255,255,0.15); border:none; color:#fff; border-radius:12px; padding:6px 12px; margin:5px 3px; cursor:pointer; transition:0.2s; display:inline-block; }
+.option-btn:hover { background: rgba(255,255,255,0.3); }
+.option-container { margin-left:0; margin-top:6px; display:flex; flex-wrap:wrap; }
+@media screen and (max-width: 600px) { #chat-box { width:90vw; height:65vh; right:5vw; } #chat-icon { width:55px; height:55px; font-size:26px; } }
+</style>
+
+<script>
+let currentTopic = null;
+let clickedSubQuestions = [];
+
+function toggleChat() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+}
+
+function resetChat() {
+    currentTopic = null;
+    clickedSubQuestions = [];
+    showMainMenu();
+}
+
+function showMainMenu() {
+    const content = document.getElementById('chat-content');
+    content.innerHTML = '';
+    appendMsg('bot', "👋 Hi! I'm your <b>Churn Assistant</b>.<br>Select a topic to explore in detail:");
+    const topicsList = [
+        "What is Churn?", "Credit Score", "Balance", "Tenure", 
+        "Estimated Salary", "Customer Activity", "Customer Satisfaction", 
+        "Has Credit Card", "Number of Products", "Why Predict Churn?", 
+        "How to Reduce Churn?", "How ML helps?"
+    ];
+    appendSubOptions(topicsList);
+}
+
+function appendSubOptions(arr) {
+    const content = document.getElementById('chat-content');
+    const div = document.createElement('div');
+    div.className = 'option-container';
+    div.innerHTML = arr.map(x => `<button class='option-btn' onclick="handleUser('${x}')">${x}</button>`).join('');
+    content.appendChild(div);
+    content.scrollTop = content.scrollHeight;
+}
+
+function appendMsg(sender, text, isHTML=false) {
+    const div = document.createElement('div');
+    div.className = sender==='bot'?'bot-msg':'user-msg';
+    div.innerHTML = isHTML ? text : text.replace(/\n/g, "<br>");
+    const chatContent = document.getElementById('chat-content');
+    chatContent.appendChild(div);
+    chatContent.scrollTop = chatContent.scrollHeight;
+    return div;
+}
+
+// Topics and sub-questions
+const topics = {
+    "What is Churn?": {
+        text: "📊 <b>Customer churn</b> is when a customer stops using the bank’s services. Understanding churn helps improve retention and customer satisfaction.",
+        sub: ["Causes of Churn","Why it matters","How banks detect churn","Real bank example"]
+    },
+    "Credit Score": {
+        text: "💳 <b>Credit score</b> measures reliability in repaying loans. Higher scores indicate trustworthy customers.",
+        sub: ["Why important?","Ideal range?","Improvement tips","Churn correlation"]
+    },
+    "Balance": {
+        text: "💰 <b>Balance</b> reflects engagement. High balances show loyalty; sudden drops can indicate potential churn.",
+        sub: ["Why balance matters","Low balance risk","Retention ideas","Example insight"]
+    },
+    "Tenure": {
+        text: "🕒 <b>Tenure</b> is the number of years a customer has been with the bank. Longer tenure usually signals loyalty.",
+        sub: ["Tenure vs Churn","Patterns seen","Improve loyalty","Real case"]
+    },
+    "Estimated Salary": {
+        text: "💵 <b>Estimated salary</b> gives insights into customer financial strength and product preferences.",
+        sub: ["Why salary matters","High vs Low impact","Retention strategies","Salary correlation"]
+    },
+    "Customer Activity": {
+        text: "📈 <b>Customer activity</b> includes transactions, login frequency, and engagement with services.",
+        sub: ["Active vs inactive","Monitoring tools","Impact on churn","Encouraging usage"]
+    },
+    "Customer Satisfaction": {
+        text: "😊 <b>Customer satisfaction</b> measures happiness with products and services. High satisfaction reduces churn.",
+        sub: ["Feedback collection","NPS importance","Improvement tips","Real case"]
+    },
+    "Has Credit Card": {
+        text: "💳 Owning a <b>credit card</b> usually increases engagement and reduces churn.",
+        sub: ["Yes vs No","Engagement impact","Product cross-sell","Churn correlation"]
+    },
+    "Number of Products": {
+        text: "🏦 More products typically indicate loyalty; fewer products can signal churn risk.",
+        sub: ["1 product risk","2-3 products","4 products","Cross-sell ideas"]
+    },
+    "Why Predict Churn?": {
+        text: "🎯 Predicting churn allows early intervention, saving revenue and improving customer retention.",
+        sub: ["Revenue impact","Retention vs acquisition","Cost saving","Example case"]
+    },
+    "How to Reduce Churn?": {
+        text: "🧠 Reduce churn via customer engagement, personalized offers, and quality service.",
+        sub: ["Retention Tactics","Loyalty Programs","AI Personalization","Service Quality"]
+    },
+    "How ML helps?": {
+        text: "🤖 Machine Learning predicts at-risk customers using key features for proactive retention.",
+        sub: ["Top features","Model accuracy","AI in banks","Challenges"]
+    }
+};
+
+// Sub-answers
+const subAnswers = {
+    "Causes of Churn":"Customers leave due to slow service, complex processes, unresponsive support, or better competitor offers.",
+    "Why it matters":"Churn impacts revenue. Retaining even 5% more customers can dramatically increase profits and reduce acquisition costs.",
+    "How banks detect churn":"Banks use analytics and predictive models to monitor inactivity, reduced balances, and negative feedback.",
+    "Real bank example":"HDFC Bank used churn prediction models to retain 20% of at-risk customers with targeted offers.",
+    "Why important?":"Credit scores affect eligibility for loans and services. Low scores increase churn risk.",
+    "Ideal range?":"Scores 700-850 are ideal; below 600 increases churn likelihood.",
+    "Improvement tips":"Maintain timely payments, reduce credit utilization, monitor reports, and diversify products.",
+    "Churn correlation":"Lower scores correlate with higher churn, indicating disengagement.",
+    "Why balance matters":"High balances indicate trust; sudden drops can signal disengagement.",
+    "Low balance risk":"Accounts with low balances are prone to churn; proactive engagement helps.",
+    "Retention ideas":"Provide personalized rewards, send reminders, and loyalty incentives.",
+    "Example insight":"Active accounts with regular deposits churn 30% less than inactive accounts.",
+    "Tenure vs Churn":"Long-term customers churn less; first 6-12 months are critical.",
+    "Patterns seen":"New customers often churn early; consistent engagement improves retention.",
+    "Improve loyalty":"Onboard carefully, personalize offers, and communicate regularly.",
+    "Real case":"Bank X increased retention 15% by analyzing tenure and targeted engagement.",
+    "Why salary matters":"Salary affects spending capacity and product usage patterns.",
+    "High vs Low impact":"Higher salary often means engagement with premium products, reducing churn.",
+    "Retention strategies":"Offer tailored benefits and incentives based on salary tiers.",
+    "Salary correlation":"Low-income accounts may require extra engagement to reduce churn.",
+    "Active vs inactive":"Active customers with frequent transactions churn less than inactive ones.",
+    "Monitoring tools":"Banks use analytics dashboards to track engagement and alert for risk.",
+    "Impact on churn":"Low activity correlates with higher churn probability.",
+    "Encouraging usage":"Gamification, reminders, and personalized suggestions increase activity.",
+    "Feedback collection":"Collect surveys, NPS scores, and online reviews to measure satisfaction.",
+    "NPS importance":"High NPS scores indicate loyal customers with low churn probability.",
+    "Improvement tips":"Act on feedback promptly and improve products/services.",
+    "Real case":"Bank Y improved retention 12% by analyzing customer satisfaction surveys.",
+    "Yes vs No":"Credit card holders show higher engagement and loyalty.",
+    "Engagement impact":"Having multiple banking products reduces churn likelihood.",
+    "Product cross-sell":"Encourage card holders to try other products for retention.",
+    "Churn correlation":"No card often correlates with higher churn.",
+    "1 product risk":"Single-product users are more likely to leave.",
+    "2-3 products":"Moderate engagement; still monitor for churn.",
+    "4 products":"High engagement and loyalty; very low churn.",
+    "Cross-sell ideas":"Offer bundled products or incentives to increase loyalty.",
+    "Revenue impact":"Churn reduces predictable revenue and increases acquisition costs.",
+    "Retention vs acquisition":"Retaining existing customers is cheaper than acquiring new ones.",
+    "Cost saving":"Predicting churn saves money via targeted interventions.",
+    "Example case":"Bank Z reduced churn 18% using early ML predictions.",
+    "Retention Tactics":"Offer incentives, personalized messages, and rewards for engagement.",
+    "Loyalty Programs":"Tiered rewards, points, and referral bonuses improve loyalty.",
+    "AI Personalization":"Use AI to recommend relevant products before churn occurs.",
+    "Service Quality":"Quick response, seamless apps, and support improve retention.",
+    "Top features":"Credit score, balance, tenure, activity, satisfaction, and products.",
+    "Model accuracy":"ML models reach 80-90% accuracy on real banking datasets.",
+    "AI in banks":"Predictive analytics, personalization, and retention campaigns.",
+    "Challenges":"Incomplete data, privacy concerns, and model interpretability."
+};
+
+function handleUser(choice) {
+    appendMsg('user', choice);
+    
+    if (topics[choice]) {
+        currentTopic = choice;
+        clickedSubQuestions = [];
+        const mainAnswerDiv = appendMsg('bot', `<span class="loading"></span> Processing...`, true);
+        setTimeout(() => {
+            mainAnswerDiv.innerHTML = topics[choice].text;
+            appendSubOptions(topics[choice].sub);
+        }, 1200);
+    } else if (subAnswers[choice]) {
+        clickedSubQuestions.push(choice);
+        const loadingDiv = appendMsg('bot', `<span class="loading"></span> Thinking...`, true);
+        setTimeout(() => {
+            loadingDiv.innerHTML = subAnswers[choice];
+            const remainingSubs = topics[currentTopic].sub.filter(q => !clickedSubQuestions.includes(q));
+            if (remainingSubs.length > 0) appendSubOptions(remainingSubs);
+            else appendMsg('bot', "✅ All sub-questions answered! Choose another topic.");
+        }, 1500);
+    }
+}
+
+// Initialize chat
+resetChat();
+</script>
+
+
+    <div class="footer">
+        <div class="footer-text">Powered by</div>
+        <div class="team-name">Team LoyaltyMinds</div>
+        <div class="footer-links">
+            1. Yashwanth Gowda KS<br>
+            2. Lalith Raj R<br>
+            3. Mahadev TT
+        </div>
+        <div style="margin-top: 12px; font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);">
+            © 2025 •Team LoyaltyMinds
+        </div>
+    </div>
+</body>
+</html>

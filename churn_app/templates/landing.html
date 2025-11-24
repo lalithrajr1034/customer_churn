@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCCP | Intelligent Churn Prediction</title>
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(180deg, #010101, #4767a1);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: #ffdf80;
+            margin-bottom: 10px;
+        }
+
+        header h2 {
+            font-size: 1.1rem;
+            color: #e0e0e0;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 25px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(6px);
+            padding: 30px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.25);
+        }
+
+        .card h3 {
+            color: #ffdf80;
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+        }
+
+        .card p, .card li {
+            color: #e0e0e0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .card ul {
+            padding-left: 25px;
+            margin-top: 10px;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            background: #ffdf80;
+            color: #002b7a;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #ffd740;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            background: rgba(255,255,255,0.08);
+            padding: 20px;
+            text-align: center;
+            color: #c9c9c9;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+
+        footer h4 {
+            color: #ffdf80;
+            margin-bottom: 8px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        footer li {
+            margin: 3px 0;
+        }
+
+        .highlight {
+            color: #ffdf80;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏦 BCCP – Intelligent Churn Prediction</h1>
+        <h2>Bank Customer Churn Prediction</h2>
+    </header>
+
+    <div class="container">
+
+        <div class="card">
+            <h3> What is Customer Churn?</h3>
+            <p>
+                <strong>Customer churn</strong> occurs when customers stop using a bank’s services. 
+                For financial institutions, understanding and predicting churn helps prevent 
+                customer loss and maintain long-term profitability.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>How This System Works</h3>
+            <p>
+                Our system uses a <span class="highlight">machine learning model</span> trained on 
+                real banking data to analyze multiple factors such as:
+            </p>
+            <ul>
+                <li>Credit Score and Balance</li>
+                <li>Age and Tenure with the Bank</li>
+                <li>Credit Card Ownership and Salary</li>
+                <li>Account Activity & Number of Products</li>
+                <li>Salary and Engagement Level</li>
+            </ul>
+            <p>
+                It then predicts the likelihood of a customer churning and provides 
+                <span class="highlight">actionable business insights</span> and retention advice.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3> How to Use</h3>
+            <ul>
+                <li>1️⃣ Click <strong>Start Prediction</strong> below.</li>
+                <li>2️⃣ Enter the customer’s details in the form.</li>
+                <li>3️⃣ The system will predict if the customer may churn or not.</li>
+                <li>4️⃣ Get instant insights and retention recommendations.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3> Key Features</h3>
+            <ul>
+                <li>Accurate ML-based Bank Customer churn prediction</li>
+                <li>Explainable reasons behind each prediction</li>
+                <li>recommendations to reduce churn</li>
+                <li>Realistic metrics and feature-based insights</li>
+                <li>Clean, intuitive user interface</li>
+            </ul>
+        </div>
+
+        <div class="btn-container">
+            <a href="{% url 'predict_churn' %}" class="btn">Start Prediction →</a>
+        </div>
+    </div>
+
+    <footer>
+        <h4>Powered by Team LoyaltyMinds</h4>
+        <ul>
+            <li>1. <strong>Yashwanth Gowda K S</strong></li>
+            <li>2. Lalith Raj R</li>
+            <li>3. Mahadev T T</li>
+        </ul>
+        <p>© 2025 BCCP | Intelligent Churn Prediction | LoyaltyMinds</p>
+    </footer>
+</body>
+</html>
